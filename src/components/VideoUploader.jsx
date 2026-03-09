@@ -4,7 +4,7 @@ const ACCEPTED = ['video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'a
 const MAX_AUDIO_MB = 25
 const MAX_VIDEO_MB = 500
 
-export default function VideoUploader({ onFileSelect, file }) {
+export default function VideoUploader({ onFileSelect, file, done }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
@@ -72,7 +72,7 @@ export default function VideoUploader({ onFileSelect, file }) {
         ) : (
           <div className="drop-hint">
             <span className="upload-icon">📁</span>
-            <p className="drop-title">Drop your video here</p>
+            <p className="drop-title">Drop your video or audio</p>
             <p className="drop-sub">or click to browse · MP4, WebM, MOV, MP3, WAV · Video up to 500MB · Audio up to 25MB</p>
           </div>
         )}
@@ -80,7 +80,7 @@ export default function VideoUploader({ onFileSelect, file }) {
 
       {error && <p className="upload-error">{error}</p>}
 
-      {file && file.type.startsWith('video/') && (
+      {file && file.type.startsWith('video/') && !done && (
         <video
           className="video-preview"
           src={URL.createObjectURL(file)}

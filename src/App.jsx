@@ -51,7 +51,7 @@ export default function App() {
       </header>
 
       <main className="main">
-        <VideoUploader file={file} onFileSelect={handleFileSelect} />
+        <VideoUploader file={file} onFileSelect={handleFileSelect} done={step === 'done'} />
 
         {file && (
           <button
@@ -71,10 +71,10 @@ export default function App() {
           </div>
         )}
 
-        {(transcription || analysis) && (
+        {step === 'done' && transcription && analysis && (
           <div className="results">
-            {transcription && <Transcription text={transcription} improved={analysis?.improved} />}
-            {analysis && <Analysis data={analysis} />}
+            <Transcription text={transcription} improved={analysis.improved} />
+            <Analysis data={analysis} />
           </div>
         )}
       </main>

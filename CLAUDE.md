@@ -24,3 +24,7 @@ When the user provides a sentence or paragraph:
 4. Offer an alternative phrasing if useful
 
 Keep explanations short and practical.
+
+## Git
+
+- Never add `Co-Authored-By` lines to commit messages.

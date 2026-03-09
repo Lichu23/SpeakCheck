@@ -241,8 +241,9 @@ export async function analyzeEnglish(transcription) {
       messages: [
         {
           role: 'system',
-          content: `You are a friendly English tutor. The user recorded themselves speaking English.
-Break their speech into individual phrases or sentences and for each one provide the native, natural English version.
+          content: `You are a friendly English tutor. The user recorded themselves SPEAKING English — this is a speech transcription, not written text. Spoken English has different norms than written English.
+
+Break their speech into meaningful phrases or sentences and for each one provide the native, natural spoken English version.
 
 Return ONLY a JSON object in this exact format:
 {
@@ -251,15 +252,22 @@ Return ONLY a JSON object in this exact format:
     {
       "original": "what the user said",
       "native": "how a native speaker would say it",
-      "note": "short explanation of what changed and why (max 1 sentence)"
+      "note": "short explanation of what changed and why (max 1 sentence)",
+      "type": "grammar"
     }
   ],
   "overall": "2-3 sentence encouraging summary of their English level and main area to work on"
 }
 
 Rules:
-- If a phrase is already perfect, still include it with native = original and note = "Perfect!"
-- Focus on making it sound natural and native, not just grammatically correct
+- SKIP filler words and filler-only phrases entirely — do NOT include phrases that are only: um, uh, like, you know, I mean, well, so, right, okay (when used as filler)
+- SKIP false starts and self-corrections (e.g. "I... I went") — these are normal in spoken English
+- Do NOT push toward formal written English — keep corrections natural for casual speech
+- Set type = "grammar" ONLY for mistakes a native speaker would NEVER make in casual speech: wrong tense ("I go yesterday"), wrong verb form ("he don't"), subject-verb disagreement ("they was"), missing/wrong article that sounds clearly wrong, wrong preposition that changes meaning
+- Set type = "style" if the phrase is grammatically correct but could sound more natural or fluent
+- Set type = "perfect" if no change is needed (native = original, note = "Perfect!")
+- Do NOT flag informal contractions like "gonna", "wanna", "kinda" — these are normal in speech
+- Do NOT flag sentence fragments — they are common in spoken English
 - Keep notes short and practical`,
         },
         {
