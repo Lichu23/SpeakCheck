@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 
 const ACCEPTED = ['video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/ogg']
-const MAX_MB = 25
+const MAX_AUDIO_MB = 25
+const MAX_VIDEO_MB = 500
 
 export default function VideoUploader({ onFileSelect, file }) {
   const inputRef = useRef(null)
@@ -14,8 +15,13 @@ export default function VideoUploader({ onFileSelect, file }) {
       setError('Unsupported format. Use MP4, WebM, MOV, MP3, WAV, or OGG.')
       return false
     }
-    if (f.size > MAX_MB * 1024 * 1024) {
-      setError(`File too large. Max ${MAX_MB}MB (Groq Whisper limit).`)
+    const isVideo = f.type.startsWith('video/')
+    const limitMB = isVideo ? MAX_VIDEO_MB : MAX_AUDIO_MB
+    if (f.size > limitMB * 1024 * 1024) {
+      setError(isVideo
+        ? `File too large. Max ${MAX_VIDEO_MB}MB for video.`
+        : `File too large. Max ${MAX_AUDIO_MB}MB for audio (Groq Whisper limit).`
+      )
       return false
     }
     return true
@@ -67,7 +73,7 @@ export default function VideoUploader({ onFileSelect, file }) {
           <div className="drop-hint">
             <span className="upload-icon">📁</span>
             <p className="drop-title">Drop your video here</p>
-            <p className="drop-sub">or click to browse · MP4, WebM, MOV, MP3, WAV · Max 25MB</p>
+            <p className="drop-sub">or click to browse · MP4, WebM, MOV, MP3, WAV · Video up to 500MB · Audio up to 25MB</p>
           </div>
         )}
       </div>
