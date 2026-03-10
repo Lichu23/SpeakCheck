@@ -1,4 +1,3 @@
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
 
 // Extracts audio from a video file.
 // Returns an Opus/OGG file (~8× smaller than WAV) if WebCodecs is available,
@@ -193,8 +192,6 @@ function audioBufferToWav(buffer) {
 }
 
 export async function transcribeVideo(file) {
-  if (!GROQ_API_KEY) throw new Error('Missing VITE_GROQ_API_KEY in .env')
-
   console.log('[transcribeVideo] File received:', file.name, file.type)
 
   const isVideo = file.type.startsWith('video/')
@@ -208,16 +205,17 @@ export async function transcribeVideo(file) {
   formData.append('response_format', 'text')
   formData.append('language', 'en')
 
-  const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+  const response = await fetch('/api/transcribe', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${GROQ_API_KEY}` },
     body: formData,
   })
 
   if (!response.ok) {
-    const err = await response.json()
-    console.error('[transcribeVideo] Groq error:', err)
-    throw new Error(err.error?.message || 'Transcription failed')
+    const text = await response.text()
+    console.error('[transcribeVideo] error:', text)
+    let message = 'Transcription failed'
+    try { message = JSON.parse(text).error?.message || message } catch {}
+    throw new Error(message)
   }
 
   const text = await response.text()
@@ -226,13 +224,10 @@ export async function transcribeVideo(file) {
 }
 
 export async function analyzeEnglish(transcription) {
-  if (!GROQ_API_KEY) throw new Error('Missing VITE_GROQ_API_KEY in .env')
-
   console.log('[analyzeEnglish] Sending transcription to Groq LLaMA...')
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch('/api/analyze', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${GROQ_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -279,9 +274,11 @@ Rules:
   })
 
   if (!response.ok) {
-    const err = await response.json()
-    console.error('[analyzeEnglish] Groq error:', err)
-    throw new Error(err.error?.message || 'Analysis failed')
+    const text = await response.text()
+    console.error('[analyzeEnglish] error:', text)
+    let message = 'Analysis failed'
+    try { message = JSON.parse(text).error?.message || message } catch {}
+    throw new Error(message)
   }
 
   const data = await response.json()
