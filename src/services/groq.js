@@ -280,7 +280,8 @@ Rules:
 - Do NOT flag informal contractions like "gonna", "wanna", "kinda" — these are normal in speech
 - Do NOT flag sentence fragments — they are common in spoken English
 - Do NOT flag capitalization or punctuation — this is a transcription, the user was SPEAKING, not writing
-- Keep notes short and practical`,
+- Keep notes short and practical
+- IMPORTANT: Each phrase must be unique — do NOT produce two entries where one original is a subset or extension of another. If you already noted a correction for "In the first place is for empanadas", do NOT create a second entry for "In the first place is for empanadas because they are delicious". Merge overlapping phrases into one`,
         },
         {
           role: 'user',
@@ -300,6 +301,19 @@ Rules:
 
   const data = await response.json()
   const result = JSON.parse(data.choices[0].message.content)
+
+  // Remove duplicate/overlapping phrases: if one original is a substring of another, keep the longer one
+  if (Array.isArray(result.phrases)) {
+    result.phrases = result.phrases.filter((phrase, i, arr) => {
+      const orig = phrase.original.toLowerCase()
+      return !arr.some((other, j) => {
+        if (i === j) return false
+        const otherOrig = other.original.toLowerCase()
+        return otherOrig.includes(orig) && otherOrig.length > orig.length
+      })
+    })
+  }
+
   console.log('[analyzeEnglish] Analysis received — phrases:', result.phrases?.length)
   return result
 }
