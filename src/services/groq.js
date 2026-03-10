@@ -193,8 +193,15 @@ function audioBufferToWav(buffer) {
 
 function fixTranscription(text) {
   return text
-    .replace(/\bi\b/g, 'I')                            // lowercase i → I
-    .replace(/(^|[.!?]\s+)([a-z])/g, (_, sep, ch) => sep + ch.toUpperCase()) // capitalize after sentence end
+    // Capitalize I before apostrophe: i'm → I'm, i've → I've, i'll → I'll, i'd → I'd
+    // covers both ASCII apostrophe (') and Unicode right single quote (\u2019)
+    .replace(/\bi(?=['\u2019])/g, 'I')
+    // Capitalize standalone I
+    .replace(/\bi\b/g, 'I')
+    // Capitalize first letter after sentence-ending punctuation (. ! ?)
+    .replace(/(^|[.!?]\s+)([a-z])/g, (_, sep, ch) => sep + ch.toUpperCase())
+    // Capitalize the very first character of the transcription
+    .replace(/^([a-z])/, ch => ch.toUpperCase())
     .trim()
 }
 
@@ -211,7 +218,7 @@ export async function transcribeVideo(file) {
   formData.append('model', 'whisper-large-v3')
   formData.append('response_format', 'text')
   formData.append('language', 'en')
-  formData.append('prompt', 'Transcribe with proper capitalization and punctuation. Always capitalize the pronoun I.')
+  formData.append('prompt', 'This is spoken English. Transcribe with proper capitalization and punctuation. The pronoun "I" must always be capitalized. Example: "I\'m going to the store. I think it\'s great."')
 
   const response = await fetch('/api/transcribe', {
     method: 'POST',
