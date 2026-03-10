@@ -4,7 +4,7 @@ const ACCEPTED = ['video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'a
 const MAX_AUDIO_MB = 25
 const MAX_VIDEO_MB = 500
 
-export default function VideoUploader({ onFileSelect, file, done }) {
+export default function VideoUploader({ onFileSelect, file, done, isLoading, step }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
@@ -80,7 +80,17 @@ export default function VideoUploader({ onFileSelect, file, done }) {
 
       {error && <p className="upload-error">{error}</p>}
 
-      {file && file.type.startsWith('video/') && !done && (
+      {isLoading && (
+        <div className="loading-state">
+          <div className="loading-spinner" />
+          <p className="loading-label">
+            {step === 'transcribing' ? 'Transcribing your audio...' : 'Analyzing your English...'}
+          </p>
+          <p className="loading-sub">This may take a moment</p>
+        </div>
+      )}
+
+      {file && file.type.startsWith('video/') && !done && !isLoading && (
         <video
           className="video-preview"
           src={URL.createObjectURL(file)}

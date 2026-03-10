@@ -51,17 +51,14 @@ export default function App() {
       </header>
 
       <main className="main">
-        <VideoUploader file={file} onFileSelect={handleFileSelect} done={step === 'done'} />
+        <VideoUploader file={file} onFileSelect={handleFileSelect} done={step === 'done'} isLoading={isLoading} step={step} />
 
-        {file && (
+        {file && !isLoading && (
           <button
             className="analyze-btn"
             onClick={handleAnalyze}
-            disabled={isLoading}
           >
-            {step === 'transcribing' && '⏳ Transcribing...'}
-            {step === 'analyzing' && '🧠 Analyzing your English...'}
-            {(step === 'idle' || step === 'done') && '🚀 Transcribe & Analyze'}
+            🚀 Transcribe & Analyze
           </button>
         )}
 
