@@ -191,6 +191,13 @@ function audioBufferToWav(buffer) {
   return new Blob([ab], { type: 'audio/wav' })
 }
 
+function fixTranscription(text) {
+  return text
+    .replace(/\bi\b/g, 'I')                            // lowercase i → I
+    .replace(/(^|[.!?]\s+)([a-z])/g, (_, sep, ch) => sep + ch.toUpperCase()) // capitalize after sentence end
+    .trim()
+}
+
 export async function transcribeVideo(file) {
   console.log('[transcribeVideo] File received:', file.name, file.type)
 
@@ -204,6 +211,7 @@ export async function transcribeVideo(file) {
   formData.append('model', 'whisper-large-v3')
   formData.append('response_format', 'text')
   formData.append('language', 'en')
+  formData.append('prompt', 'Transcribe with proper capitalization and punctuation. Always capitalize the pronoun I.')
 
   const response = await fetch('/api/transcribe', {
     method: 'POST',
@@ -218,7 +226,8 @@ export async function transcribeVideo(file) {
     throw new Error(message)
   }
 
-  const text = await response.text()
+  const raw = await response.text()
+  const text = fixTranscription(raw)
   console.log('[transcribeVideo] Transcription received:', text.slice(0, 100) + (text.length > 100 ? '...' : ''))
   return text
 }
