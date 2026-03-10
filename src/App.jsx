@@ -53,7 +53,7 @@ export default function App() {
       <main className="main">
         <VideoUploader file={file} onFileSelect={handleFileSelect} done={step === 'done'} isLoading={isLoading} step={step} />
 
-        {file && !isLoading && (
+        {file && !isLoading && step !== 'done' && (
           <button
             className="analyze-btn"
             onClick={handleAnalyze}
