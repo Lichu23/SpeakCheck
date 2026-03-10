@@ -263,6 +263,7 @@ Rules:
 - Set type = "perfect" if no change is needed (native = original, note = "Perfect!")
 - Do NOT flag informal contractions like "gonna", "wanna", "kinda" — these are normal in speech
 - Do NOT flag sentence fragments — they are common in spoken English
+- Do NOT flag capitalization or punctuation — this is a transcription, the user was SPEAKING, not writing
 - Keep notes short and practical`,
         },
         {
