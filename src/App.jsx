@@ -2,6 +2,8 @@ import { useState } from 'react'
 import VideoUploader from './components/VideoUploader'
 import Transcription from './components/Transcription'
 import Analysis from './components/Analysis'
+import RenderLogger from './components/RenderLogger'
+import UserList from './components/UserList'
 import { transcribeVideo, analyzeEnglish } from './services/groq'
 
 export default function App() {
@@ -74,6 +76,8 @@ export default function App() {
             <Analysis data={analysis} />
           </div>
         )}
+
+        <UserList />
       </main>
     </div>
   )
